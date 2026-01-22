@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CalAI Privado</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#0b1220" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>CalAI Privado</h1>
+      <p class="sub">Registro rápido de comidas (gratis)</p>
+    </div>
+    <button id="exportBtn" class="ghost">Exportar</button>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Nueva comida</h2>
+
+      <div class="grid">
+        <label class="field">
+          <span>Foto (opcional)</span>
+          <input id="photo" type="file" accept="image/*" capture="environment" />
+          <small>En iPhone abre cámara si está disponible.</small>
+        </label>
+
+        <label class="field">
+          <span>Nombre</span>
+          <input id="name" type="text" placeholder="Ej: pollo con arroz" />
+        </label>
+
+        <label class="field">
+          <span>Tipo base</span>
+          <select id="foodBase"></select>
+          <small>Tabla editable en Ajustes.</small>
+        </label>
+
+        <label class="field">
+          <span>Porción</span>
+          <select id="portion">
+            <option value="0.75">Pequeña</option>
+            <option value="1" selected>Normal</option>
+            <option value="1.35">Grande</option>
+            <option value="1.7">Muy grande</option>
+          </select>
+        </label>
+
+        <div class="row">
+          <label class="field">
+            <span>Extra kcal</span>
+            <input id="extraKcal" type="number" inputmode="numeric" placeholder="0" />
+          </label>
+
+          <label class="field">
+            <span>Nota</span>
+            <input id="note" type="text" placeholder="Ej: con salsa" />
+          </label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="addBtn" class="primary">Añadir al historial</button>
+        <button id="clearPhotoBtn" class="ghost">Quitar foto</button>
+      </div>
+
+      <div id="preview" class="preview hidden">
+        <img id="previewImg" alt="preview" />
+      </div>
+
+      <div class="hint">
+        <strong>Tip:</strong> Para hacerlo “más tipo IA”, lo siguiente sería conectar un servicio de análisis.
+        Te lo puedo dejar preparado como modo opcional gratis (cuando me digas si quieres).
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="between">
+        <h2>Hoy</h2>
+        <button id="resetTodayBtn" class="danger ghost">Borrar hoy</button>
+      </div>
+
+      <div class="totals" id="totals"></div>
+      <div class="list" id="list"></div>
+    </section>
+
+    <section class="card">
+      <div class="between">
+        <h2>Ajustes</h2>
+        <button id="resetAllBtn" class="danger ghost">Reset total</button>
+      </div>
+
+      <p class="sub2">Edita la tabla base (por 1 porción “Normal”).</p>
+
+      <div class="tableWrap">
+        <table id="baseTable">
+          <thead>
+            <tr>
+              <th>Comida</th>
+              <th>kcal</th>
+              <th>P</th>
+              <th>C</th>
+              <th>G</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button id="addBaseBtn" class="ghost">Añadir comida</button>
+        <button id="restoreDefaultsBtn" class="ghost">Restaurar defaults</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Privado, sin cuentas, sin pagar.</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
