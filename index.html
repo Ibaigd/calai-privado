@@ -4,28 +4,98 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CalAI Privado</title>
+
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css" />
   <meta name="theme-color" content="#0b1220" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
 </head>
+
 <body>
+  <!-- LOCK -->
+  <div id="lockScreen" class="lock hidden">
+    <div class="lockCard">
+      <h2>🔒 Bloqueado</h2>
+      <p>Introduce tu PIN</p>
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="6" placeholder="PIN" />
+      <div class="actions">
+        <button id="unlockBtn" class="primary">Desbloquear</button>
+        <button id="noPinBtn" class="ghost">No tengo PIN</button>
+      </div>
+      <small class="muted">El PIN se guarda solo en tu iPhone.</small>
+    </div>
+  </div>
+
   <header class="top">
     <div>
       <h1>CalAI Privado</h1>
-      <p class="sub">Registro rápido de comidas (gratis)</p>
+      <p class="sub">Objetivos · gráficas · backup · offline</p>
     </div>
-    <button id="exportBtn" class="ghost">Exportar</button>
+    <div class="hdrBtns">
+      <button id="exportCsvBtn" class="ghost">CSV</button>
+      <button id="exportJsonBtn" class="ghost">JSON</button>
+      <button id="importJsonBtn" class="ghost">Importar</button>
+    </div>
   </header>
 
   <main class="wrap">
+    <!-- GOALS -->
     <section class="card">
-      <h2>Nueva comida</h2>
+      <div class="between">
+        <h2>Objetivo del día</h2>
+        <button id="toggleGoalsBtn" class="ghost">Editar</button>
+      </div>
+
+      <div id="goalSummary" class="goalSummary"></div>
+
+      <div id="goalEditor" class="grid hidden">
+        <div class="row">
+          <label class="field">
+            <span>Objetivo kcal</span>
+            <input id="goalKcal" type="number" inputmode="numeric" />
+          </label>
+          <label class="field">
+            <span>Proteína (g)</span>
+            <input id="goalP" type="number" inputmode="numeric" />
+          </label>
+        </div>
+        <div class="row">
+          <label class="field">
+            <span>Carbohidratos (g)</span>
+            <input id="goalC" type="number" inputmode="numeric" />
+          </label>
+          <label class="field">
+            <span>Grasa (g)</span>
+            <input id="goalG" type="number" inputmode="numeric" />
+          </label>
+        </div>
+        <div class="actions">
+          <button id="saveGoalsBtn" class="primary">Guardar objetivos</button>
+          <button id="cancelGoalsBtn" class="ghost">Cancelar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW MEAL -->
+    <section class="card">
+      <div class="between">
+        <h2>Nueva comida</h2>
+        <div class="smallRow">
+          <input id="searchBase" class="miniInput" placeholder="Buscar base…" />
+          <select id="portion" class="miniInput">
+            <option value="0.75">Pequeña</option>
+            <option value="1" selected>Normal</option>
+            <option value="1.35">Grande</option>
+            <option value="1.7">Muy grande</option>
+          </select>
+        </div>
+      </div>
 
       <div class="grid">
         <label class="field">
           <span>Foto (opcional)</span>
           <input id="photo" type="file" accept="image/*" capture="environment" />
-          <small>En iPhone abre cámara si está disponible.</small>
+          <small>La foto se guarda localmente si quieres mantenerla.</small>
         </label>
 
         <label class="field">
@@ -36,17 +106,6 @@
         <label class="field">
           <span>Tipo base</span>
           <select id="foodBase"></select>
-          <small>Tabla editable en Ajustes.</small>
-        </label>
-
-        <label class="field">
-          <span>Porción</span>
-          <select id="portion">
-            <option value="0.75">Pequeña</option>
-            <option value="1" selected>Normal</option>
-            <option value="1.35">Grande</option>
-            <option value="1.7">Muy grande</option>
-          </select>
         </label>
 
         <div class="row">
@@ -54,46 +113,90 @@
             <span>Extra kcal</span>
             <input id="extraKcal" type="number" inputmode="numeric" placeholder="0" />
           </label>
-
           <label class="field">
             <span>Nota</span>
             <input id="note" type="text" placeholder="Ej: con salsa" />
           </label>
         </div>
-      </div>
 
-      <div class="actions">
-        <button id="addBtn" class="primary">Añadir al historial</button>
-        <button id="clearPhotoBtn" class="ghost">Quitar foto</button>
-      </div>
+        <div class="actions">
+          <button id="addBtn" class="primary">Añadir</button>
+          <button id="clearPhotoBtn" class="ghost">Quitar foto</button>
+        </div>
 
-      <div id="preview" class="preview hidden">
-        <img id="previewImg" alt="preview" />
-      </div>
-
-      <div class="hint">
-        <strong>Tip:</strong> Para hacerlo “más tipo IA”, lo siguiente sería conectar un servicio de análisis.
-        Te lo puedo dejar preparado como modo opcional gratis (cuando me digas si quieres).
+        <div id="preview" class="preview hidden">
+          <img id="previewImg" alt="preview" />
+        </div>
       </div>
     </section>
 
+    <!-- DAY NAV + TOTALS + LIST -->
     <section class="card">
       <div class="between">
-        <h2>Hoy</h2>
-        <button id="resetTodayBtn" class="danger ghost">Borrar hoy</button>
+        <div class="dayNav">
+          <button id="prevDayBtn" class="ghost">◀</button>
+          <div>
+            <h2 id="dayTitle" class="dayTitle">Hoy</h2>
+            <div id="dayKeyLabel" class="muted"></div>
+          </div>
+          <button id="nextDayBtn" class="ghost">▶</button>
+        </div>
+        <div class="rightBtns">
+          <button id="dupLastBtn" class="ghost">Duplicar última</button>
+          <button id="resetDayBtn" class="danger ghost">Borrar día</button>
+        </div>
       </div>
 
       <div class="totals" id="totals"></div>
       <div class="list" id="list"></div>
     </section>
 
+    <!-- CHARTS -->
+    <section class="card">
+      <div class="between">
+        <h2>Gráficas (7 días)</h2>
+        <button id="toggleChartsBtn" class="ghost">Mostrar/Ocultar</button>
+      </div>
+      <div id="chartsWrap" class="charts">
+        <canvas id="chartKcal" height="140"></canvas>
+        <canvas id="chartMacros" height="140"></canvas>
+        <div class="muted small">
+          * Gráficas locales (no envía datos a ningún lado).
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
     <section class="card">
       <div class="between">
         <h2>Ajustes</h2>
         <button id="resetAllBtn" class="danger ghost">Reset total</button>
       </div>
 
-      <p class="sub2">Edita la tabla base (por 1 porción “Normal”).</p>
+      <div class="grid">
+        <div class="row">
+          <label class="field">
+            <span>PIN (opcional)</span>
+            <input id="pinSet" type="password" inputmode="numeric" maxlength="6" placeholder="Deja vacío para desactivar" />
+            <small>6 dígitos máximo.</small>
+          </label>
+          <label class="field">
+            <span>Guardar fotos</span>
+            <select id="keepPhotos">
+              <option value="1" selected>Sí</option>
+              <option value="0">No</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="savePinBtn" class="ghost">Guardar PIN</button>
+        </div>
+      </div>
+
+      <hr class="sep" />
+
+      <p class="sub2">Tabla base (por 1 porción “Normal”).</p>
 
       <div class="tableWrap">
         <table id="baseTable">
@@ -116,12 +219,15 @@
         <button id="restoreDefaultsBtn" class="ghost">Restaurar defaults</button>
       </div>
     </section>
+
+    <input id="importFile" type="file" accept="application/json" class="hidden" />
   </main>
 
   <footer class="foot">
-    <span>Privado, sin cuentas, sin pagar.</span>
+    <span>Privado · Gratis · Sin cuentas</span>
   </footer>
 
+  <script src="pwa.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
